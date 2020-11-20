@@ -1,0 +1,137 @@
+{
+  "version": "1.0.0",
+  "title": "We can tolerate a small latency from internal services",
+  "description": "While we can tolerate a small latency between services, how far can we really delay before the user gets a poorer experience.",
+  "configuration": {
+    "front_url": {
+      "type": "env",
+      "key": "FRONT_URL",
+      "default": "http://localhost:30080/"
+    }
+  },
+  "steady-state-hypothesis": {
+    "title": "n/a",
+    "probes": [
+      {
+        "type": "probe",
+        "name": "front-service-must-be-ok",
+        "tolerance": 200,
+        "provider": {
+          "type": "http",
+          "url": "${front_url}"
+        }
+      },
+      {
+        "type": "probe",
+        "name": "front-service-does-not-return-an-error",
+        "tolerance": {
+          "type": "jsonpath",
+          "target": "body",
+          "path": "$.error",
+          "count": 0
+        },
+        "provider": {
+          "type": "http",
+          "url": "${front_url}"
+        }
+      }
+    ]
+  },
+  "method": [
+    {
+      "type": "action",
+      "name": "simulate-some-traffic",
+      "background": true,
+      "provider": {
+        "type": "process",
+        "path": "vegeta",
+        "arguments": "attack -targets=experiments/data/latency.txt -workers=1 -rate=1 -connections=3  -duration=25s -output=experiments/data/latency.bin"
+      }
+    },
+    {
+      "type": "action",
+      "name": "inject-latency",
+      "provider": {
+        "type": "python",
+        "module": "chaosk8s.crd.actions",
+        "func": "create_custom_object",
+        "arguments": {
+          "group": "chaos-mesh.org",
+          "plural": "networkchaos",
+          "version": "v1alpha1",
+          "resource": {
+            "apiVersion": "chaos-mesh.org/v1alpha1",
+            "kind": "NetworkChaos",
+            "metadata": {
+              "name": "delaying-middle-1",
+              "namespace": "default"
+            },
+            "spec": {
+              "action": "delay",
+              "mode": "one",
+              "selector": {
+                "namespaces": [
+                  "default"
+                ],
+                "labelSelectors": {
+                  "app": "middle"
+                }
+              },
+              "delay": {
+                "latency": "1500ms"
+              },
+              "duration": "10s",
+              "scheduler": {
+                "cron": "@every 15s"
+              }
+            }
+          }
+        }
+      },
+      "pauses": {
+        "before": 5,
+        "after": 20
+      }
+    },
+    {
+      "type": "action",
+      "name": "plot-traffic",
+      "provider": {
+        "type": "process",
+        "path": "vegeta",
+        "arguments": "plot experiments/data/latency.bin > experiments/data/latency.html"
+      }
+    },
+    {
+      "type": "probe",
+      "name": "fetch-application-logs",
+      "provider": {
+        "type": "python",
+        "module": "chaosk8s.pod.probes",
+        "func": "read_pod_logs",
+        "arguments": {
+          "label_selector": "app=front",
+          "container_name": "front",
+          "last": "25s"
+        }
+      }
+    }
+  ],
+  "rollbacks": [
+    {
+      "type": "action",
+      "name": "remove-latency",
+      "provider": {
+        "type": "python",
+        "module": "chaosk8s.crd.actions",
+        "func": "delete_custom_object",
+        "arguments": {
+          "group": "chaos-mesh.org",
+          "plural": "networkchaos",
+          "version": "v1alpha1",
+          "name": "delaying-middle-1"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "version": "1.0.0",
+  "title": "Rolling out a new version of the middle service does not impact our users",
+  "description": "n/a",
+  "configuration": {
+    "front_url": {
+      "type": "env",
+      "key": "FRONT_URL",
+      "default": "http://localhost:30080/"
+    }
+  },
+  "steady-state-hypothesis": {
+    "title": "n/a",
+    "probes": [
+      {
+        "type": "probe",
+        "name": "front-service-must-be-ok",
+        "tolerance": 200,
+        "provider": {
+          "type": "http",
+          "url": "${front_url}"
+        }
+      },
+      {
+        "type": "probe",
+        "name": "front-service-does-not-return-an-error",
+        "tolerance": true,
+        "provider": {
+          "type": "python",
+          "module": "tolerances",
+          "func": "should_not_have_any_errors",
+          "arguments": {
+            "filepath": "experiments/data/middle_service_restarts.json"
+          }
+        }
+      }
+    ]
+  },
+  "method": [
+    {
+      "type": "action",
+      "name": "simulate-some-traffic",
+      "background": true,
+      "provider": {
+        "type": "process",
+        "path": "vegeta",
+        "arguments": "attack -targets=experiments/data/middle_service_restarts.txt -workers=2 -rate=10 -timeout=3s -duration=10s -output=experiments/data/middle_service_restarts.bin"
+      }
+    },
+    {
+      "type": "action",
+      "name": "terminate-middle-pod",
+      "pauses": {
+        "before": 5,
+        "after": 8
+      },
+      "provider": {
+        "type": "python",
+        "module": "chaosk8s.pod.actions",
+        "func": "delete_pods",
+        "arguments": {
+          "name": "middle"
+        }
+      }
+    },
+    {
+      "type": "action",
+      "name": "transform-http-traces",
+      "provider": {
+        "type": "process",
+        "path": "vegeta",
+        "arguments": "encode --output experiments/data/middle_service_restarts.json --to json < experiments/data/middle_service_restarts.bin"
+      }
+    },
+    {
+      "type": "probe",
+      "name": "fetch-application-logs",
+      "provider": {
+        "type": "python",
+        "module": "chaosk8s.pod.probes",
+        "func": "read_pod_logs",
+        "arguments": {
+          "label_selector": "app=middle",
+          "container_name": "middle",
+          "last": "10s"
+        }
+      }
+    }
+  ]
+}

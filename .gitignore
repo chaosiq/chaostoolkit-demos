@@ -1,0 +1,6 @@
+__pycache__/
+experiments/data/*.bin
+experiments/data/*.html
+experiments/data/*.json
+chaostoolkit.log
+journal.json
