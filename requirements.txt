@@ -1,0 +1,1 @@
+chaostoolkit-kubernetes~=0.25

@@ -11,6 +11,12 @@
 The Kubernetes cluster CNI must support
 [Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/).
 
+You will also need to install extensions for Chaos Toolkit:
+
+```
+$ pip install -r requirements.txt
+```
+
 ## Architecture
 
 We have three web services called front, middle and back. They are chained.
