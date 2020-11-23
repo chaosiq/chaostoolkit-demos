@@ -367,7 +367,8 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - protocol: TCP
+  - name: http
+    protocol: TCP
     port: 8000
     targetPort: 8000
   selector:
@@ -383,7 +384,8 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - protocol: TCP
+  - name: http
+    protocol: TCP
     port: 8001
     targetPort: 8001
   selector:
@@ -399,7 +401,8 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - protocol: TCP
+  - name: http
+    protocol: TCP
     port: 8002
     targetPort: 8002
   selector:
@@ -441,3 +444,45 @@ spec:
     services:
     - name: front
       port: 8000
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: front
+  labels:
+    app: front
+spec:
+  jobLabel: front
+  namespaceSelector:
+    matchNames:
+    - default
+  selector:
+    matchLabels:
+      service: front
+  endpoints:
+  - port: http
+    path: /metrics
+    scheme: http
+    interval: 10s
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: middle
+  labels:
+    app: middle
+spec:
+  jobLabel: middle
+  namespaceSelector:
+    matchNames:
+    - default
+  selector:
+    matchLabels:
+      service: middle
+  endpoints:
+  - port: http
+    path: /metrics
+    scheme: http
+    interval: 10s

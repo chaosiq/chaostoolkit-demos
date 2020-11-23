@@ -5,6 +5,11 @@ from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.routing import Route
+from starlette_exporter import PrometheusMiddleware, handle_metrics
+from prometheus_client import Counter
+
+ERROR_COUNT = Counter(
+    "failed_call", "Counts of calls that failed", ("to",))
 
 
 async def main(request: Request) -> JSONResponse:
@@ -15,6 +20,7 @@ async def main(request: Request) -> JSONResponse:
             request.app.last_value = value
             return JSONResponse({"value": value})
         except httpx.TransportError as x:
+            ERROR_COUNT.labels("middle").inc()
             logging.error(
                 "Failed to talk with the middle service", exc_info=True)
             return JSONResponse(
@@ -28,3 +34,5 @@ app = Starlette(debug=True, routes=[
     Route('/', main),
 ])
 app.last_value = 0
+app.add_middleware(PrometheusMiddleware)
+app.add_route("/metrics", handle_metrics)

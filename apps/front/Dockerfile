@@ -1,6 +1,7 @@
 FROM python:3.9-alpine
 
-RUN pip install --no-cache-dir starlette uvicorn httpx
+RUN pip install --no-cache-dir \
+    starlette starlette_exporter prometheus-client uvicorn httpx
 EXPOSE 8000
 
 COPY . .

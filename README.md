@@ -5,7 +5,8 @@
 * a Kubernetes cluster: minikube or [microk8s](https://microk8s.io/)
   should work (tested on the latter)
 * [Chaos Toolkit](https://docs.chaostoolkit.org/reference/usage/install/)
-* [chaos mesh](https://chaos-mesh.org/) deployed in your 
+* [chaos mesh](https://chaos-mesh.org/) deployed in your cluster
+* [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator) deployed in your cluster
 * [vegeta](https://github.com/tsenart/vegeta)
 
 The Kubernetes cluster CNI must support
