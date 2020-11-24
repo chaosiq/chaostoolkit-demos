@@ -69,6 +69,8 @@ Chaos Mesh which adds a delay of 1500ms to the middle service, going above the
 During the experiment, we run a very midle load to simulate traffic that can
 be used to demonstrate the latency.
 
+![Latency](https://github.com/chaosiq/chaostoolkit-demos/raw/main/static/middle_service_has_latency.png)
+
 Note how we force the rollbacks to happen so that the delay is removed from
 the middle service when we terminate the experiment.
 
