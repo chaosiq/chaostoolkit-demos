@@ -107,13 +107,38 @@ network to the back service.
 To run that scenario:
 
 ```
-$ chaos run --rollback-strategy=always experiments/middle_service_restarts.json
+$ chaos run --rollback-strategy=always experiments/stricter_network_policy.json
 ```
 
 The experiment has two probes to define the baseline:
 
 * the fact the service responds with a 200
 * the fact the service didn't include an error message in the response
+
+When you run this experiment, the network loss is faked by adding a new
+network policy with a stricter scope. In essence we tell Kubernetes, the
+back service does not allow incoming communication anymore.
+
+Notice how we have rollback here to remove that policy.
+
+This requires that your CNI supports network policies.
+
+#### Variant using Prometheus
+
+This experiment explores the same condition as before but now uses Prometheus
+to request the number of errors reported by the middle service when conversing
+with the back service.
+
+To run that scenario:
+
+```
+$ chaos run --rollback-strategy=always experiments/stricter_network_policy_with_prometheus.json
+```
+
+The experiment has two probes to define the baseline:
+
+* the fact the service responds with a 200
+* the fact we don't notice any error increases in Prometheus
 
 When you run this experiment, the network loss is faked by adding a new
 network policy with a stricter scope. In essence we tell Kubernetes, the
