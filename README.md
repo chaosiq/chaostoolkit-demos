@@ -147,3 +147,16 @@ back service does not allow incoming communication anymore.
 Notice how we have rollback here to remove that policy.
 
 This requires that your CNI supports network policies.
+
+## Generate reports
+
+For each of the scenario above, you can generate a PDF/HTML report as follows:
+
+```
+$ chaos report --export-format=pdf journal.json report.pdf
+```
+
+This requires the
+[Chaos Reporting](https://github.com/chaostoolkit/chaostoolkit-reporting)
+extension which is quite involved to be installed. You can also use its docker
+image but you will not have the charts from the vegeta results included.
