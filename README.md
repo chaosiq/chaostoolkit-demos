@@ -132,6 +132,8 @@ with the back service.
 To run that scenario:
 
 ```
+$ export PYTHONPATH=`pwd`/experiments/ctkextensions
+$ export PROMETHEUS_URL=http://$(kubectl -n monitoring get svc prometheus-k8s --output jsonpath='{.spec.clusterIP}'):9090
 $ chaos run --rollback-strategy=always experiments/stricter_network_policy_with_prometheus.json
 ```
 
