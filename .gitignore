@@ -5,3 +5,4 @@ experiments/data/*.json
 chaostoolkit.log
 journal.json
 .vscode/
+report.pdf
