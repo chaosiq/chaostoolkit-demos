@@ -1,1 +1,2 @@
 chaostoolkit-kubernetes~=0.25
+chaostoolkit-prometheus~=0.3

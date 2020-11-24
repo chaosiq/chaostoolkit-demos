@@ -4,3 +4,4 @@ experiments/data/*.html
 experiments/data/*.json
 chaostoolkit.log
 journal.json
+.vscode/
