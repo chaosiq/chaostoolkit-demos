@@ -97,6 +97,8 @@ When you run this experiment, the pod for the middle service is deleted, faking
 its restart. Because we ran some load during the restart, we got some error
 messages from the front service and that triggered the baseline to deviate.
 
+![Latency](https://github.com/chaosiq/chaostoolkit-demos/raw/main/static/middle_service_restarts.png)
+
 Notice how we have no rollbacks here because the middle service is of course
 restarted by Kubernetes.
 
@@ -120,6 +122,8 @@ The experiment has two probes to define the baseline:
 When you run this experiment, the network loss is faked by adding a new
 network policy with a stricter scope. In essence we tell Kubernetes, the
 back service does not allow incoming communication anymore.
+
+![Latency](https://github.com/chaosiq/chaostoolkit-demos/raw/main/static/stricter_network_policy.png)
 
 Notice how we have rollback here to remove that policy.
 

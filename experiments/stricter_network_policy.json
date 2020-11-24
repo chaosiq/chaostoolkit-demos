@@ -45,7 +45,7 @@
       "provider": {
         "type": "process",
         "path": "vegeta",
-        "arguments": "attack -targets=experiments/data/stricter_network_policy.txt -workers=2 -rate=10 -timeout=3s -duration=10s -output=experiments/data/stricter_network_policy.bin"
+        "arguments": "attack -targets=experiments/data/stricter_network_policy.txt -workers=1 -rate=2 -timeout=3s -duration=10s -output=experiments/data/stricter_network_policy.bin"
       }
     },
     {

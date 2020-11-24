@@ -44,7 +44,7 @@
       "provider": {
         "type": "process",
         "path": "vegeta",
-        "arguments": "attack -targets=experiments/data/middle_service_restarts.txt -workers=2 -rate=10 -timeout=3s -duration=10s -output=experiments/data/middle_service_restarts.bin"
+        "arguments": "attack -targets=experiments/data/middle_service_restarts.txt -workers=1 -rate=2 -timeout=3s -duration=40s -output=experiments/data/middle_service_restarts.bin"
       }
     },
     {
@@ -52,7 +52,7 @@
       "name": "terminate-middle-pod",
       "pauses": {
         "before": 5,
-        "after": 8
+        "after": 20
       },
       "provider": {
         "type": "python",
@@ -82,7 +82,7 @@
         "arguments": {
           "label_selector": "app=middle",
           "container_name": "middle",
-          "last": "10s"
+          "last": "20s"
         }
       }
     }
