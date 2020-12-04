@@ -45,7 +45,7 @@
       "provider": {
         "type": "process",
         "path": "vegeta",
-        "arguments": "attack -targets=experiments/data/latency.txt -workers=1 -rate=1 -connections=3  -duration=25s -output=experiments/data/latency.bin"
+        "arguments": "attack -targets=lab1/vegeta.txt -workers=1 -rate=1 -connections=3  -duration=25s -output=lab2/vegeta_results.bin"
       }
     },
     {
@@ -99,7 +99,7 @@
       "provider": {
         "type": "process",
         "path": "vegeta",
-        "arguments": "plot experiments/data/latency.bin > experiments/data/latency.html"
+        "arguments": "plot lab2/vegeta_results.bin > lab2/vegeta_results.html"
       }
     },
     {

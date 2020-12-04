@@ -1,6 +1,6 @@
 __pycache__/
-experiments/data/*.bin
-experiments/data/*.html
+lab*/*.bin
+lab*/*.html
 experiments/data/*.json
 chaostoolkit.log
 journal.json

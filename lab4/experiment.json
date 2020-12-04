@@ -64,7 +64,7 @@
       "provider": {
         "type": "process",
         "path": "vegeta",
-        "arguments": "attack -targets=experiments/data/stricter_network_policy.txt -workers=2 -rate=10 -timeout=3s -duration=10s -output=experiments/data/stricter_network_policy.bin"
+        "arguments": "attack -targets=lab4/vegeta.txt -workers=2 -rate=10 -timeout=3s -duration=10s -output=lab4/vegeta.bin"
       }
     },
     {
@@ -91,7 +91,7 @@
       "provider": {
         "type": "process",
         "path": "vegeta",
-        "arguments": "plot experiments/data/stricter_network_policy.bin > experiments/data/stricter_network_policy.html"
+        "arguments": "plot lab4/vegeta.bin > lab4/vegeta.html"
       }
     },
     {

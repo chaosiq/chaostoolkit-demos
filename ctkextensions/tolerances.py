@@ -1,3 +1,5 @@
+from base64 import b64decode
+import json
 import os.path
 from typing import Any, Dict
 
@@ -17,8 +19,10 @@ def should_not_have_any_errors(filepath: str) -> bool:
 
     with open(filepath) as f:
         for l in f:
-            if "error" in l:
-                logger.error("Found an error in traces")
+            record = json.loads(b64decode(json.loads(l).get("body")))
+            error = record.get("error")
+            if error:
+                logger.error("Found an error in traces: {}".format(error))
                 return False
     return True
 

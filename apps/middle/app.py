@@ -3,7 +3,7 @@ import logging
 import httpx
 from starlette.applications import Starlette
 from starlette.requests import Request
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 from starlette.routing import Route
 from starlette_exporter import PrometheusMiddleware, handle_metrics
 from prometheus_client import Counter
@@ -30,8 +30,13 @@ async def main(request: Request) -> JSONResponse:
                 }, status_code=200)
 
 
+async def health(request: Request) -> Response:
+    return Response()
+
+
 app = Starlette(debug=True, routes=[
     Route('/', main),
+    Route('/health', health)
 ])
 app.last_value = 0
 app.add_middleware(PrometheusMiddleware)
