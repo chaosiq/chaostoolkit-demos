@@ -1,3 +1,4 @@
 chaostoolkit-kubernetes~=0.25
 chaostoolkit-prometheus~=0.3
 jsonpath2~=0.4
+chaostoolkit-addons~=0.1

@@ -112,7 +112,8 @@ In itself, Chaos Toolkit does not have any capabilities to operate systems. You
 need to installation that target these systems.
 
 ```
-$ pip install chaostoolkit-kubernetes chaostoolkit-prometheus
+$ pip install chaostoolkit-kubernetes chaostoolkit-prometheus \
+    chaostoolkit-addons jsonpath2
 ```
 
 You can verify they are now available by running:
