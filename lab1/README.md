@@ -171,7 +171,7 @@ Let's now run this experiment against our cluster. First by preparing the
 environment
 
 ```console
-$ rm lab1/vegeta_results.json
+$ rm -f lab1/vegeta_results.json
 $ export PYTHONPATH=`pwd`/ctkextensions
 ```
 
@@ -182,7 +182,7 @@ full blown Python package.
 We are now ready to run it:
 
 ```console
-$ chaos run lab1/experiments.json 
+$ chaos run lab1/experiment.json 
 [2020-12-03 21:56:04 INFO] Validating the experiment's syntax
 [2020-12-03 21:56:05 INFO] Experiment looks valid
 [2020-12-03 21:56:05 INFO] Running experiment: Rolling out a new version of the middle service does not impact our users
@@ -234,7 +234,7 @@ $ kubectl scale --replicas=2 deployment/middle
 This will add a new pod for the `middle` service. Let's run it again:
 
 ```console
-$ chaos run lab1/experiments.json 
+$ chaos run lab1/experiment.json 
 [2020-12-03 21:57:27 INFO] Validating the experiment's syntax
 [2020-12-03 21:57:27 INFO] Experiment looks valid
 [2020-12-03 21:57:27 INFO] Running experiment: Rolling out a new version of the middle service does not impact our users
