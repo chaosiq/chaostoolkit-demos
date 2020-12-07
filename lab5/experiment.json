@@ -1,0 +1,150 @@
+{
+  "version": "1.0.0",
+  "title": "Losing the ability to talk to the internal services should be adjusted for",
+  "description": "In case we lose connection to our internal services, our front service ought to degrade gracefully",
+  "configuration": {
+    "front_url": {
+      "type": "env",
+      "key": "FRONT_URL",
+      "default": "http://localhost:30080/"
+    },
+    "prometheus_base_url": {
+        "type": "env",
+        "key": "PROMETHEUS_URL",
+        "default": "http://localhost:9090/"
+    }
+  },
+  "controls": [
+      {
+          "name": "safeguard",
+          "provider": {
+              "type": "python",
+              "module": "chaosaddons.controls.safeguards",
+              "arguments": {
+                "probes": [
+                    {
+                        "name": "no-crashloop-alerted",
+                        "type": "probe",
+                        "provider": {
+                            "type": "python",
+                            "module": "probes",
+                            "func": "alert_is_not_firing",
+                            "arguments": {
+                                "alert_name": "KubePodCrashLooping"
+                            }
+                        },
+                        "frequency": 30,
+                        "tolerance": true
+                    }
+                ]
+              }
+          }
+      }
+  ],
+  "steady-state-hypothesis": {
+    "title": "n/a",
+    "probes": [
+      {
+        "type": "probe",
+        "name": "front-service-must-be-ok",
+        "tolerance": 200,
+        "provider": {
+          "type": "http",
+          "url": "${front_url}"
+        }
+      },
+      {
+        "type": "probe",
+        "name": "fetch-number-of-failed-calls-from-front-to-middle",
+        "tolerance": {
+            "type": "probe",
+            "name": "error-count",
+            "provider": {
+                "type": "python",
+                "module": "tolerances",
+                "func": "error_count_should_not_grow",
+                "arguments": {}
+            }
+        },
+        "provider": {
+          "type": "python",
+          "module": "chaosprometheus.probes",
+          "func": "query_interval",
+          "arguments": {
+            "query": "failed_call_total{to='middle'}",
+            "start": "30 seconds ago",
+            "end": "now",
+            "step": 3
+          }
+        },
+        "pauses": {
+            "before": 20
+        }
+      }
+    ]
+  },
+  "method": [
+    {
+      "type": "action",
+      "name": "simulate-some-traffic",
+      "background": true,
+      "provider": {
+        "type": "process",
+        "path": "vegeta",
+        "arguments": "attack -targets=lab4/vegeta.txt -workers=2 -rate=10 -timeout=3s -duration=10s -output=lab4/vegeta.bin"
+      }
+    },
+    {
+      "type": "action",
+      "name": "deny-all-ingress-traffic",
+      "pauses": {
+        "before": 5,
+        "after": 5
+      },
+      "provider": {
+        "type": "python",
+        "module": "chaosk8s.networking.actions",
+        "func": "deny_all_ingress",
+        "arguments": {
+          "label_selectors": {
+            "app": "back"
+          }
+        }
+      }
+    },
+    {
+      "type": "action",
+      "name": "plot-traffic",
+      "provider": {
+        "type": "process",
+        "path": "vegeta",
+        "arguments": "plot lab4/vegeta.bin > lab4/vegeta.html"
+      }
+    },
+    {
+      "type": "probe",
+      "name": "fetch-application-logs",
+      "provider": {
+        "type": "python",
+        "module": "chaosk8s.pod.probes",
+        "func": "read_pod_logs",
+        "arguments": {
+          "label_selector": "app=front",
+          "container_name": "front",
+          "last": "10s"
+        }
+      }
+    }
+  ],
+  "rollbacks": [
+    {
+      "type": "action",
+      "name": "remove-deny-all-ingress-traffic",
+      "provider": {
+        "type": "python",
+        "module": "chaosk8s.networking.actions",
+        "func": "remove_deny_all_ingress"
+      }
+    }
+  ]
+}

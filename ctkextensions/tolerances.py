@@ -32,6 +32,9 @@ def error_count_should_not_grow(value: Dict[str, Any] = None) -> bool:
     Go through all the error counts and raise an error when we notice an
     increase.
     """
+    if not value["data"]["result"]:
+        return True
+
     values = value["data"]["result"][0]["values"]
     if not values:
         return True

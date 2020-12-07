@@ -1,0 +1,59 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: failing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: failing
+  template:
+    metadata:
+      name: failing
+      labels:
+        name: failing
+        app: failing
+        service: failing
+    spec:
+      containers:
+      - image: chaostoolkit/failing
+        name: front
+        ports:
+        - containerPort: 8004
+          protocol: TCP
+        imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8004
+          periodSeconds: 1
+          failureThreshold: 1
+        resources:
+          limits:
+            cpu: "100m"
+            memory: 64Mi
+          requests:
+            cpu: "100m"
+            memory: 64Mi
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: failing
+  labels:
+    service: failing
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    protocol: TCP
+    port: 8004
+    targetPort: 8004
+  selector:
+    service: failing
